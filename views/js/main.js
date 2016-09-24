@@ -514,7 +514,12 @@ window.addEventListener('scroll', updatePositions);
 document.addEventListener('DOMContentLoaded', function() {
   var cols = 8;
   var s = 256;
-  for (var i = 0; i < 200; i++) {
+  // set a reasonable number of rows based on screen height
+  var rows = Math.round(window.screen.height / s);
+    var flyingPizzaNum = cols * rows;
+  // getElementById seems to be faster than querySelector
+  var flyingPizza = document.getElementById("movingPizzas1");
+  for (var i = 0; i < flyingPizzaNum; i++) {
     var elem = document.createElement('img');
     elem.className = 'mover';
     elem.src = "images/pizza.png";
@@ -522,7 +527,7 @@ document.addEventListener('DOMContentLoaded', function() {
     elem.style.width = "73.333px";
     elem.basicLeft = (i % cols) * s;
     elem.style.top = (Math.floor(i / cols) * s) + 'px';
-    document.querySelector("#movingPizzas1").appendChild(elem);
+    flyingPizza.appendChild(elem);
   }
   updatePositions();
 });
