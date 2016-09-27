@@ -485,7 +485,65 @@ function logAverageFrame(times) {   // times is the array of User Timing measure
 
 // The following code for sliding background pizzas was pulled from Ilya's demo found at:
 // https://www.igvita.com/slides/2012/devtools-tips-and-tricks/jank-demo.html
+// document.getElementsByClassName("mover").style.transform = "translate(10px)";
+// adding will-change: transform; may help speeding things up?
 
+// trying to adapt technique found on
+// www.html5rocks.com/en/tutorials/speed/animations/#debouncing-scroll-events
+/* TODO: implementing this script
+var movers          = document.querySelectorAll('.mover'),
+    lastScrollY     = 0,
+    ticking         = false;
+
+(function init() {
+  for(var m = 0; m < movers.length; m++) {
+    movers[m].style.top = (m * 10) + 'px';
+  }
+})();
+
+function onScroll() {
+	latestKnownScrollY = window.scrollY;
+	requestTick();
+}
+
+function requestTick() {
+  if(!ticking) {
+    requestAnimationFrame(update);
+    ticking = true;
+  }
+}
+
+function update() {
+  var mover               = null,
+    moverTop            = [],
+    halfWindowHeight    = window.innerHeight * 0.5,
+    offset              = 0;
+
+	// first loop is going to do all
+	// the reflows (since we use offsetTop)
+  for(var m = 0; m < movers.length; m++) {
+    mover       = movers[m];
+    moverTop[m] = mover.offsetTop;
+  }
+
+	// second loop is going to go through
+	// the movers and add the left class
+	// to the elements' classlist
+  for(var m = 0; m < movers.length; m++) {
+    mover       = movers[m];
+    if(lastScrollY > moverTop[m] - halfWindowHeight) {
+      mover.classList.add('left');
+    } else {
+      mover.classList.remove('left');
+    }
+  }
+	// allow further rAFs to be called
+  ticking = false;
+}
+
+// only listen for scroll events
+window.addEventListener('scroll', onScroll, false);
+*/
 // Moves the sliding background pizzas based on scroll position
 function updatePositions() {
   frame++;
@@ -514,15 +572,77 @@ window.addEventListener('scroll', updatePositions);
 document.addEventListener('DOMContentLoaded', function() {
   var cols = 8;
   var s = 256;
-  for (var i = 0; i < 200; i++) {
-    var elem = document.createElement('img');
-    elem.className = 'mover';
-    elem.src = "images/pizza.png";
-    elem.style.height = "100px";
-    elem.style.width = "73.333px";
-    elem.basicLeft = (i % cols) * s;
-    elem.style.top = (Math.floor(i / cols) * s) + 'px';
-    document.querySelector("#movingPizzas1").appendChild(elem);
-  }
-  updatePositions();
+  // set a reasonable number of rows based on screen height
+   var rows = Math.round(window.screen.height / s);
+   var flyingPizzaNum = cols * rows;
+   // getElementById seems to be faster than querySelector
+   var flyingPizza = document.getElementById("movingPizzas1");
+   for (var i = 0; i < flyingPizzaNum; i++) {
+     var elem = document.createElement('img');
+     elem.className = 'mover';
+     elem.src = "images/pizza.png";
+     elem.style.height = "100px";
+     elem.style.width = "73.333px";
+     elem.basicLeft = (i % cols) * s;
+     elem.style.top = (Math.floor(i / cols) * s) + 'px';
+     flyingPizza.appendChild(elem);
+   }
+   updatePositions();
 });
+
+/* FIRST EXAMPLE
+var latestKnownScrollY = 0;
+
+function onScroll() {
+	latestKnownScrollY = window.scrollY;
+}
+
+function update() {
+	requestAnimationFrame(update);
+
+	var currentScrollY = latestKnownScrollY;
+
+	// read offset of DOM elements
+	// and compare to the currentScrollY value
+	// then apply some CSS classes
+	// to the visible items
+}
+
+// kick off
+requestAnimationFrame(update);
+
+
+// SECOND EXAMPLE
+
+
+var latestKnownScrollY = 0,
+	ticking = false;
+
+function onScroll() {
+	latestKnownScrollY = window.scrollY;
+	requestTick();
+}
+
+function requestTick() {
+	if(!ticking) {
+		requestAnimationFrame(update);
+	}
+	ticking = true;
+}
+
+function update() {
+	// reset the tick so we can
+	// capture the next onScroll
+	ticking = false;
+
+	var currentScrollY = latestKnownScrollY;
+
+	// read offset of DOM elements
+	// and compare to the currentScrollY value
+	// then apply some CSS classes
+	// to the visible items
+}
+
+// kick off - no longer needed! Woo.
+// update();
+*/
