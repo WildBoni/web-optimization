@@ -486,15 +486,32 @@ function logAverageFrame(times) {   // times is the array of User Timing measure
 // The following code for sliding background pizzas was pulled from Ilya's demo found at:
 // https://www.igvita.com/slides/2012/devtools-tips-and-tricks/jank-demo.html
 
-// Moves the sliding background pizzas based on scroll position
+// trying to adapt technique found on for proper use of requestAnimationFrame
+// www.html5rocks.com/en/tutorials/speed/animations/#debouncing-scroll-events
+
+var ticking = false;
+
+function onScroll() {
+	requestTick();
+}
+
+function requestTick() {
+  if(!ticking) {
+    requestAnimationFrame(updatePositions);
+    ticking = true;
+  }
+}
+
 function updatePositions() {
   frame++;
   window.performance.mark("mark_start_frame");
 
-
+	ticking = false;
   var items = document.querySelectorAll('.mover');
-  for (var i = 0; i < items.length; i++) {
-    var phase = Math.sin((document.body.scrollTop / 1250) + (i % 5));
+	// avoid forced reflow by moving scrollTop calculation outside of loop
+  var prePhase = document.body.scrollTop / 1250;
+  for(var i = 0; i < items.length; i++) {
+    var phase = Math.sin(prePhase + (i % 5));
     items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
   }
 
@@ -508,8 +525,8 @@ function updatePositions() {
   }
 }
 
-// runs updatePositions on scroll
-window.addEventListener('scroll', updatePositions);
+// using requestAnimationFrame through onScroll function to improve performance
+window.addEventListener('scroll', onScroll);
 
 // Generates the sliding pizzas when the page loads.
 document.addEventListener('DOMContentLoaded', function() {
@@ -523,12 +540,12 @@ document.addEventListener('DOMContentLoaded', function() {
   for (var i = 0; i < flyingPizzaNum; i++) {
     var elem = document.createElement('img');
     elem.className = 'mover';
-    elem.src = "images/pizza.png";
+    // use properly resized png
+    elem.src = "images/pizza_background.png";
     elem.style.height = "100px";
     elem.style.width = "73.333px";
     elem.basicLeft = (i % cols) * s;
     elem.style.top = (Math.floor(i / cols) * s) + 'px';
     flyingPizza.appendChild(elem);
   }
-  updatePositions();
 });
