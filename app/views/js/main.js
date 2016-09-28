@@ -438,6 +438,7 @@ var resizePizzas = function(size) {
         console.log("bug in sizeSwitcher");
     }
 
+    // querySelectorAll goes outside of the loop to improve performance
     var randomPizzas = document.querySelectorAll(".randomPizzaContainer");
 
     for (var i = 0; i < randomPizzas.length; i++) {
@@ -486,9 +487,11 @@ function logAverageFrame(times) {   // times is the array of User Timing measure
 // The following code for sliding background pizzas was pulled from Ilya's demo found at:
 // https://www.igvita.com/slides/2012/devtools-tips-and-tricks/jank-demo.html
 
-// trying to adapt technique found on for proper use of requestAnimationFrame
-// www.html5rocks.com/en/tutorials/speed/animations/#debouncing-scroll-events
+// trying to adapt technique found on
+// www.html5rocks.com/en/tutorials/speed/animations/#debouncing-scroll-events and
+// https://developer.mozilla.org/en-US/docs/Web/Events/scroll
 
+// using ticking var to control requestAnimationFrame
 var ticking = false;
 
 function onScroll() {
@@ -547,5 +550,6 @@ document.addEventListener('DOMContentLoaded', function() {
     elem.basicLeft = (i % cols) * s;
     elem.style.top = (Math.floor(i / cols) * s) + 'px';
     flyingPizza.appendChild(elem);
+    // no need to call updatePositions() froom here
   }
 });
