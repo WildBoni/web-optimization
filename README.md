@@ -29,39 +29,39 @@ You can see the online optimized version at [https://wildboni.github.io/dist/ind
 ###### Now gulp.js and all its dependencies are ready to run!
 
 1. To play around with the source files in app folder, you can setup a web server and see live browser refresh changes by using
-- ``` sh
+  ``` sh
   $> cd /path/to/your-project-folder
   $> gulp devtool
   ```
->  If you save changes to an .html, .css or .js file, the browser page will be automatically refreshed!
+  If you save changes to an .html, .css or .js file, the browser page will be automatically refreshed!
 2. To apply changes and setup the dist version of the optimized website, simply
-- ``` sh
+ ``` sh
   $> cd /path/to/your-project-folder
   $> gulp
   ```
->This will automatically run a few gulp tasks:
+This will automatically run a few gulp tasks:
 - Deleting the existing dist folder
-- ``` sh
+  ``` sh
   $> gulp clean:dist
   ```
 - Minifying .js and .css files
-- ``` sh
+  ``` sh
   $> gulp compress-js
   $> gulp minify-css
   ```
 - Optimizing images
-- ``` sh
+  ``` sh
   $> gulp images
   $> gulp images2
   ```
 - Copying html files
-- ``` sh
+  ``` sh
   $> gulp html
   $> gulp html2
   ```
-> Every command above will create files in a brand new dist folder
+ Every command above will create files in a brand new dist folder
 - Running a web server and opening browser window on dist/index.html
-- ``` sh
+  ``` sh
   $> gulp distServer
   ```
 
@@ -84,7 +84,7 @@ The "pizzapocalypse" has been soved using the following methods:
 
 ###### main.js
 - Re-factor changePizzaSizes function according to "stop FSL" lesson: get rid of weird size calculations and move querySelector outside of for loop.
-- ``` sh
+  ``` bash
   function changePizzaSizes(size) {
     switch(size) {
       case "1":
@@ -106,18 +106,18 @@ The "pizzapocalypse" has been soved using the following methods:
   }
   ```
 - Move randomPizzas assignment ouside of the for loop
-- ``` sh
+  ``` bash
     var pizzasDiv = document.getElementById("randomPizzas");
     for (var i = 2; i < 100; i++) {
         pizzasDiv.appendChild(pizzaElementGenerator(i));
     }
   ```
 - Add a scroll event listener that calls onScroll function
-- ``` sh
+  ``` bash
     window.addEventListener('scroll', onScroll);
   ```
 - onScroll function uses ticking variable to control requestAnimationFrame, that optimizes the updatePositions function, creating smooth background pizzas animation when page is scrolled
-- ``` sh
+- ``` bash
     var ticking = false;
     function onScroll() {
 	    requestTick();
@@ -130,7 +130,7 @@ The "pizzapocalypse" has been soved using the following methods:
     }
   ```
 - updatePositions runs faster thanks to prePhase variable, that avoids forced reflow by moving scrollTop outside of for loop
-  ``` sh
+  ``` bash
     function updatePositions() {
         frame++;
         window.performance.mark("mark_start_frame");
@@ -150,7 +150,7 @@ The "pizzapocalypse" has been soved using the following methods:
     }
   ```
 -  The number of background pizzas is now controlled through screen height: less pizzas means faster loading!
-- ``` sh
+  ``` bash
     document.addEventListener('DOMContentLoaded', function() {
         var cols = 8;
         var s = 256;
