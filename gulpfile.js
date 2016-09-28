@@ -17,11 +17,11 @@ gulp.task('browserSync', function() {
   })
 });
 
-gulp.task('default', ['browserSync'], function (){
+gulp.task('devtool', ['browserSync'], function (){
   gulp.watch('app/**/*.+(html|css|js)', browserSync.reload);
 })
 
-gulp.task('compress', function (cb) {
+gulp.task('compress-js', function (cb) {
   pump([
         gulp.src('app/js/*.js'),
         gulpIf('*.js', uglify()),
@@ -73,9 +73,17 @@ gulp.task('clean:dist', function() {
   return del.sync('dist');
 })
 
-gulp.task('build', function (callback) {
+gulp.task('distServer', function() {
+  browserSync.init({
+    server: {
+      baseDir: "dist"
+    },
+  })
+});
+
+gulp.task('default', function (callback) {
   runSequence('clean:dist',
-    ['compress', 'minify-css', 'images', 'images2', 'html', 'html2'],
+    ['compress-js', 'minify-css', 'images', 'images2', 'html', 'html2'], 'distServer',
     callback
   )
 })
