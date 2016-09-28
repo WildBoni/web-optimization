@@ -1,55 +1,184 @@
-## Website Performance Optimization portfolio project
+# Website Performance Optimization portfolio project
 
 Your challenge, if you wish to accept it (and we sure hope you will), is to optimize this online portfolio for speed! In particular, optimize the critical rendering path and make this page render as quickly as possible by applying the techniques you've picked up in the [Critical Rendering Path course](https://www.udacity.com/course/ud884).
 
 To get started, check out the repository and inspect the code.
 
-### Getting started
+## Getting started
 
-####Part 1: Optimize PageSpeed Insights score for index.html
+##### Online version
 
-Some useful tips to help you get started:
+You can see the online optimized version at [https://wildboni.github.io/dist/index.html](https://wildboni.github.io/dist/index.html).
 
-1. Check out the repository
-1. To inspect the site on your phone, you can run a local server
 
-  ```bash
-  $> cd /path/to/your-project-folder
-  $> python -m SimpleHTTPServer 8080
+##### Running locally
+
+1. Clone the GitHub repository
+
+  ```sh
+  $> git clone https://github.com/WildBoni/wildboni.github.io.git
   ```
 
-1. Open a browser and visit localhost:8080
-1. Download and install [ngrok](https://ngrok.com/) to the top-level of your project directory to make your local server accessible remotely.
+2. Install [Node.js](https://nodejs.org/)
 
-  ``` bash
+3.  Open command line and
+  ``` sh
   $> cd /path/to/your-project-folder
-  $> ./ngrok http 8080
+  $> npm install
+  ```
+###### Now gulp.js and all its dependencies are ready to run!
+
+1. To play around with the source files in app folder, you can setup a web server and see live browser refresh changes by using
+- ``` sh
+  $> cd /path/to/your-project-folder
+  $> gulp devtool
+  ```
+>  If you save changes to an .html, .css or .js file, the browser page will be automatically refreshed!
+2. To apply changes and setup the dist version of the optimized website, simply
+- ``` sh
+  $> cd /path/to/your-project-folder
+  $> gulp
+  ```
+>This will automatically run a few gulp tasks:
+- Deleting the existing dist folder
+- ``` sh
+  $> gulp clean:dist
+  ```
+- Minifying .js and .css files
+- ``` sh
+  $> gulp compress-js
+  $> gulp minify-css
+  ```
+- Optimizing images
+- ``` sh
+  $> gulp images
+  $> gulp images2
+  ```
+- Copying html files
+- ``` sh
+  $> gulp html
+  $> gulp html2
+  ```
+> Every command above will create files in a brand new dist folder
+- Running a web server and opening browser window on dist/index.html
+- ``` sh
+  $> gulp distServer
   ```
 
-1. Copy the public URL ngrok gives you and try running it through PageSpeed Insights! Optional: [More on integrating ngrok, Grunt and PageSpeed.](http://www.jamescryer.com/2014/06/12/grunt-pagespeed-and-ngrok-locally-testing/)
+### Optimize index.html
 
-Profile, optimize, measure... and then lather, rinse, and repeat. Good luck!
+To get a faster page load a few changes have been made:
 
-####Part 2: Optimize Frames per Second in pizza.html
+- Inline style.css
+- Add media="print" to print.css link
+- Async load javascript files
+- Script webfont load
+- Optimize larger images
 
-To optimize views/pizza.html, you will need to modify views/js/main.js until your frames per second rate is 60 fps or higher. You will find instructive comments in main.js. 
+### Optimize pizza.html and main.js
 
-You might find the FPS Counter/HUD Display useful in Chrome developer tools described here: [Chrome Dev Tools tips-and-tricks](https://developer.chrome.com/devtools/docs/tips-and-tricks).
+The "pizzapocalypse" has been soved using the following methods:
 
-### Optimization Tips and Tricks
-* [Optimizing Performance](https://developers.google.com/web/fundamentals/performance/ "web performance")
-* [Analyzing the Critical Rendering Path](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/analyzing-crp.html "analyzing crp")
-* [Optimizing the Critical Rendering Path](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/optimizing-critical-rendering-path.html "optimize the crp!")
-* [Avoiding Rendering Blocking CSS](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/render-blocking-css.html "render blocking css")
+###### pizza.html
+- Inline style.css
+
+###### main.js
+- Re-factor changePizzaSizes function according to "stop FSL" lesson: get rid of weird size calculations and move querySelector outside of for loop.
+- ``` sh
+  function changePizzaSizes(size) {
+    switch(size) {
+      case "1":
+        newWidth = 25;
+        break;
+      case "2":
+        newWidth = 33.3;
+        break;
+      case "3":
+        newWidth = 50;
+        break;
+      default:
+        console.log("bug in sizeSwitcher");
+    }
+    var randomPizzas = document.querySelectorAll(".randomPizzaContainer");
+    for (var i = 0; i < randomPizzas.length; i++) {
+      randomPizzas[i].style.width = newWidth + "%";
+    }
+  }
+  ```
+- Move randomPizzas assignment ouside of the for loop
+- ``` sh
+    var pizzasDiv = document.getElementById("randomPizzas");
+    for (var i = 2; i < 100; i++) {
+        pizzasDiv.appendChild(pizzaElementGenerator(i));
+    }
+  ```
+- Add a scroll event listener that calls onScroll function
+- ``` sh
+    window.addEventListener('scroll', onScroll);
+  ```
+- onScroll function uses ticking variable to control requestAnimationFrame, that optimizes the updatePositions function, creating smooth background pizzas animation when page is scrolled
+- ``` sh
+    var ticking = false;
+    function onScroll() {
+	    requestTick();
+    }
+    function requestTick() {
+        if(!ticking) {
+            requestAnimationFrame(updatePositions);
+            ticking = true;
+        }
+    }
+  ```
+- updatePositions runs faster thanks to prePhase variable, that avoids forced reflow by moving scrollTop outside of for loop
+  ``` sh
+    function updatePositions() {
+        frame++;
+        window.performance.mark("mark_start_frame");
+	    ticking = false;
+        var items = document.querySelectorAll('.mover');
+        var prePhase = document.body.scrollTop / 1250;
+        for(var i = 0; i < items.length; i++) {
+            var phase = Math.sin(prePhase + (i % 5));
+            items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
+        }
+        window.performance.mark("mark_end_frame");
+        window.performance.measure("measure_frame_duration", "mark_start_frame", "mark_end_frame");
+        if (frame % 10 === 0) {
+            var timesToUpdatePosition = window.performance.getEntriesByName("measure_frame_duration");
+        logAverageFrame(timesToUpdatePosition);
+        }
+    }
+  ```
+-  The number of background pizzas is now controlled through screen height: less pizzas means faster loading!
+- ``` sh
+    document.addEventListener('DOMContentLoaded', function() {
+        var cols = 8;
+        var s = 256;
+        // set a reasonable number of rows based on screen height
+        var rows = Math.round(window.screen.height / s);
+        var flyingPizzaNum = cols * rows;
+        // getElementById seems to be faster than querySelector
+        var flyingPizza = document.getElementById("movingPizzas1");
+        for (var i = 0; i < flyingPizzaNum; i++) {
+            var elem = document.createElement('img');
+            elem.className = 'mover';
+            // use properly resized png
+            elem.src = "images/pizza_background.png";
+            elem.style.height = "100px";
+            elem.style.width = "73.333px";
+            elem.basicLeft = (i % cols) * s;
+            elem.style.top = (Math.floor(i / cols) * s) + 'px';
+            flyingPizza.appendChild(elem);
+            // no need to call updatePositions() froom here
+        }
+    });
+  ```
+### Useful links and resources
+* [Gulp for begnners](https://css-tricks.com/gulp-for-beginners/)
+* [Web Font Loader](https://github.com/typekit/webfontloader)
+* [QuerySelector vs getElements](http://stackoverflow.com/questions/14377590/queryselector-and-queryselectorall-vs-getelementsbyclassname-and-getelementbyid)
+* [Browser Rendering Optimization](https://github.com/nghuuphuoc/Browser-Rendering-Optimization)
 * [Optimizing JavaScript](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/adding-interactivity-with-javascript.html "javascript")
-* [Measuring with Navigation Timing](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/measure-crp.html "nav timing api"). We didn't cover the Navigation Timing API in the first two lessons but it's an incredibly useful tool for automated page profiling. I highly recommend reading.
-* <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/eliminate-downloads.html">The fewer the downloads, the better</a>
-* <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/optimize-encoding-and-transfer.html">Reduce the size of text</a>
-* <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/image-optimization.html">Optimize images</a>
-* <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching.html">HTTP caching</a>
-
-### Customization with Bootstrap
-The portfolio was built on Twitter's <a href="http://getbootstrap.com/">Bootstrap</a> framework. All custom styles are in `dist/css/portfolio.css` in the portfolio repo.
-
-* <a href="http://getbootstrap.com/css/">Bootstrap's CSS Classes</a>
-* <a href="http://getbootstrap.com/components/">Bootstrap's Components</a>
+* [Faster animations with requestAnimationFrame](http://www.html5rocks.com/en/tutorials/speed/animations/#debouncing-scroll-events)
+* [scroll event explained](https://developer.mozilla.org/en-US/docs/Web/Events/scroll)
+* [Udacity website optimization course](https://www.udacity.com/course/website-performance-optimization--ud884)
