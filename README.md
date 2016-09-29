@@ -1,15 +1,16 @@
 # Website Performance Optimization portfolio project
 
+## Goal
+
 Your challenge, if you wish to accept it (and we sure hope you will), is to optimize this online portfolio for speed! In particular, optimize the critical rendering path and make this page render as quickly as possible by applying the techniques you've picked up in the [Critical Rendering Path course](https://www.udacity.com/course/ud884).
 
 To get started, check out the repository and inspect the code.
 
-## Getting started
+## Solution
 
 ##### Online version
 
 You can see the online optimized version at [https://wildboni.github.io/dist/index.html](https://wildboni.github.io/dist/index.html).
-
 
 ##### Running locally
 
@@ -22,45 +23,63 @@ You can see the online optimized version at [https://wildboni.github.io/dist/ind
 2. Install [Node.js](https://nodejs.org/)
 
 3.  Open command line and
+
   ```
   cd /path/to/your-project-folder
   npm install
   ```
+
 ###### Now gulp.js and all its dependencies are ready to run!
 
 1. To play around with the source files in app folder, you can setup a web server and see live browser refresh changes by using
+
   ```
   cd /path/to/your-project-folder
   gulp devtool
   ```
-  If you save changes to an .html, .css or .js file, the browser page will be automatically refreshed!
+
+>  If you save changes to an .html, .css or .js file, the browser page will be automatically refreshed!
+
 2. To apply changes and setup the dist version of the optimized website, simply
+
   ```
   cd /path/to/your-project-folder
   gulp
   ```
+
 This will automatically run a few gulp tasks:
+
 - Deleting the existing dist folder
+
   ```
   gulp clean:dist
   ```
+
 - Minifying .js and .css files
+
   ```
   gulp compress-js
   gulp minify-css
   ```
+
 - Optimizing images
+
   ```
   gulp images
   gulp images2
   ```
+
 - Copying html files
+
   ```
   gulp html
   gulp html2
   ```
-  Every command above will create files in a brand new dist folder
+
+>  Every command above will create files in a brand new dist folder
+
 - Running a web server and opening browser window on dist/index.html
+
   ```
   gulp distServer
   ```
@@ -80,11 +99,13 @@ To get a faster page load a few changes have been made:
 The "pizzapocalypse" has been soved using the following methods:
 
 ###### pizza.html
+
 - Inline style.css
 
 ###### main.js
 - Re-factor changePizzaSizes function according to "stop FSL" lesson: get rid of weird size calculations and move querySelector outside of for loop.
-  ```
+
+  ```javascript
   function changePizzaSizes(size) {
     switch(size) {
       case "1":
@@ -105,19 +126,25 @@ The "pizzapocalypse" has been soved using the following methods:
     }
   }
   ```
+
 - Move randomPizzas assignment ouside of the for loop
-  ```
+
+  ```javascript
     var pizzasDiv = document.getElementById("randomPizzas");
     for (var i = 2; i < 100; i++) {
         pizzasDiv.appendChild(pizzaElementGenerator(i));
     }
   ```
+
 - Add a scroll event listener that calls onScroll function
-  ```
+
+  ```javascript
     window.addEventListener('scroll', onScroll);
   ```
+
 - onScroll function uses ticking variable to control requestAnimationFrame, that optimizes the updatePositions function, creating smooth background pizzas animation when page is scrolled
-- ```
+
+  ```javascript
     var ticking = false;
     function onScroll() {
 	    requestTick();
@@ -129,8 +156,10 @@ The "pizzapocalypse" has been soved using the following methods:
         }
     }
   ```
+
 - updatePositions runs faster thanks to prePhase variable, that avoids forced reflow by moving scrollTop outside of for loop
-  ```
+
+  ```javascript
     function updatePositions() {
         frame++;
         window.performance.mark("mark_start_frame");
@@ -149,8 +178,10 @@ The "pizzapocalypse" has been soved using the following methods:
         }
     }
   ```
+
 -  The number of background pizzas is now controlled through screen height: less pizzas means faster loading!
-  ```
+
+  ```javascript
     document.addEventListener('DOMContentLoaded', function() {
         var cols = 8;
         var s = 256;
@@ -173,7 +204,9 @@ The "pizzapocalypse" has been soved using the following methods:
         }
     });
   ```
+
 ### Useful links and resources
+
 * [Gulp for begnners](https://css-tricks.com/gulp-for-beginners/)
 * [Web Font Loader](https://github.com/typekit/webfontloader)
 * [QuerySelector vs getElements](http://stackoverflow.com/questions/14377590/queryselector-and-queryselectorall-vs-getelementsbyclassname-and-getelementbyid)
