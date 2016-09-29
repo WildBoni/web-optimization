@@ -439,7 +439,7 @@ var resizePizzas = function(size) {
     }
 
     // querySelectorAll goes outside of the loop to improve performance
-    var randomPizzas = document.querySelectorAll(".randomPizzaContainer");
+    var randomPizzas = document.getElementsByClassName("randomPizzaContainer");
 
     for (var i = 0; i < randomPizzas.length; i++) {
       randomPizzas[i].style.width = newWidth + "%";
@@ -537,11 +537,12 @@ document.addEventListener('DOMContentLoaded', function() {
   var s = 256;
   // set a reasonable number of rows based on screen height
   var rows = Math.round(window.screen.height / s);
-    var flyingPizzaNum = cols * rows;
+  var flyingPizzaNum = cols * rows;
   // getElementById seems to be faster than querySelector
   var flyingPizza = document.getElementById("movingPizzas1");
+  var elem;
   for (var i = 0; i < flyingPizzaNum; i++) {
-    var elem = document.createElement('img');
+    elem = document.createElement('img');
     elem.className = 'mover';
     // use properly resized png
     elem.src = "images/pizza_background.png";
@@ -550,6 +551,6 @@ document.addEventListener('DOMContentLoaded', function() {
     elem.basicLeft = (i % cols) * s;
     elem.style.top = (Math.floor(i / cols) * s) + 'px';
     flyingPizza.appendChild(elem);
-    // no need to call updatePositions() froom here
+    updatePositions();
   }
 });
