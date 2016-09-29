@@ -495,7 +495,7 @@ function logAverageFrame(times) {   // times is the array of User Timing measure
 var ticking = false;
 
 function onScroll() {
-	requestTick();
+  requestTick();
 }
 
 function requestTick() {
@@ -509,9 +509,9 @@ function updatePositions() {
   frame++;
   window.performance.mark("mark_start_frame");
 
-	ticking = false;
+  ticking = false;
   var items = document.querySelectorAll('.mover');
-	// avoid forced reflow by moving scrollTop calculation outside of loop
+  // avoid forced reflow by moving scrollTop calculation outside of loop
   var prePhase = document.body.scrollTop / 1250;
   for(var i = 0; i < items.length; i++) {
     var phase = Math.sin(prePhase + (i % 5));
