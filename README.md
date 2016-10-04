@@ -8,14 +8,14 @@ My challenge was to optimize this online portfolio for speed! In particular, I h
 
 ##### Online version
 
-You can see the online optimized version at [https://wildboni.github.io/dist/index.html](https://wildboni.github.io/dist/index.html).
+You can see the online optimized version at [https://wildboni.github.io/web-optimization/dist/index.html](https://wildboni.github.io/web-optimization/dist/index.html).
 
 ##### Running locally
 
 1. Clone the GitHub repository
 
   ```
-  git clone https://github.com/WildBoni/wildboni.github.io.git
+  git clone https://github.com/WildBoni/web-optimization.git
   ```
 
 2. Install [Node.js](https://nodejs.org/)
